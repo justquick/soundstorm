@@ -1,0 +1,23 @@
+{% extends 'list.html' %}
+
+{% block head %}
+<table><tr><td>
+<a href="/songs/browse/">Home</a>&gt;
+{% if crumbs %}
+{% for url,name in crumbs %}
+<a href="{{ url }}">{{ name }}</a>&gt;
+{% endfor %}
+{% endif %}
+{% if dirs %}
+<ol>
+{% for name,dir in dirs %}
+<li><a href="/songs/browse/{{ dir }}">{{ name }}</a></li>
+{% endfor %}
+</ol>
+{% endif %}
+</td><td>
+{% endblock %}
+
+{% block foot %}
+</td></tr></table>
+{% endblock %}

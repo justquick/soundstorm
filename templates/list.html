@@ -1,0 +1,42 @@
+{% load pagination_tags audioplayer %}
+{% autopaginate songs %}
+
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript">
+function info(id){
+    $('#info_'+id).load('/info/'+id+'/');
+}
+
+function player(id){
+    $('#player_'+id).load('/player/'+id+'/');
+}
+
+function close_info(id){
+    $('#info_'+id).html('<a href="javascript:info('+id+');">get info</a>');
+}
+function close_player(id){
+    $('#player_'+id).html('<a href="javascript:player('+id+');">play song</a>');
+}
+
+</script>
+{% paginate %}
+<table border=1>
+    <tr>
+        <th><a href="?order={% ifequal order 'title' %}-title{% else %}title{% endifequal %}">Name</a></th>
+        <th><a href="?order={% ifequal order 'author' %}-author{% else %}author{% endifequal %}">Author</a></th>
+        <th><a href="?order={% ifequal order 'album' %}-album{% else %}album{% endifequal %}">Album</a></th>
+        <th>Info</th>
+        <th>Play</th>
+   </tr>
+
+{% for song in songs %}
+    <tr>
+        <td><a href="/songs/download/{{ song.id }}/">{% if song.title %}{{ song.title }}{% else %}{{ song }}{% endif %}</a></td>
+        <td>{% if song.author %}{{ song.author }}{% else %}&nbsp;{% endif %}</td>
+        <td>{% if song.album %}{{ song.album }}{% else %}&nbsp;{% endif %}</td>
+        <td><div id="info_{{ song.id }}"><a href="javascript:info({{ song.id }});">get info</a></div></td>
+        <td><div id="player_{{ song.id }}">{% audioplayer file=song.get_absolute_url %}</td>
+    </tr>
+{% endfor %}
+</table>
+{% block foot %}{% endblock %}

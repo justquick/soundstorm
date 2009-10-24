@@ -1,0 +1,230 @@
+
+
+The audioplayer app
+###################
+
+.. admonition:: About this document
+
+   This document describes how to install and use the Django audioplayer app. 
+
+.. contents::
+   :depth: 3
+
+
+A Django application for integrating a Flash based mp3 audioplayer into
+templates using a custom template tag. It uses the flashplayer from
+1pixelout_  and can be easily customized by template parameters.
+
+.. _1pixelout: http://www.1pixelout.net/code/audio-player-wordpress-plugin
+
+Download
+========
+
+The audioplayer app is only available as a tarball. It contains the Django
+application and the flashplayer from 1pixelout_. Also note the Changelog_
+
+- django_audioplayer-0.2.2.tgz_
+- django_audioplayer-0.2.1.tgz_
+- django_audioplayer-0.2.tgz_
+- django_audioplayer-0.1.tgz_
+
+.. _django_audioplayer-0.2.2.tgz: http://www.pyjax.net/download/django_audioplayer-0.2.2.tgz
+.. _django_audioplayer-0.2.1.tgz: http://www.pyjax.net/download/django_audioplayer-0.2.1.tgz
+.. _django_audioplayer-0.2.tgz: http://www.pyjax.net/download/django_audioplayer-0.2.tgz
+.. _django_audioplayer-0.1.tgz: http://www.pyjax.net/download/django_audioplayer-0.1.tgz
+    
+
+Installation
+============
+To install the audioplayer app, follow these steps:
+
+1. Unpack the downloaded tarball in your projects directory
+2. Add myproject.audioplayer`` to your ``INSTALLED_APPS`` variable
+3. Configure your webserver or ``urls.py`` to serve the Flash file
+   ``player.swf`` found in the ``media/audioplayer`` subdirectory. By
+   default the player is searched at
+   ``{{ MEDIA_URL }}/audioplayer/player.swf`` but that can be changed
+   (see below).
+
+That's it. The audioplayer does not use any models or views, only a custom
+template tag named ``audioplayer``.  
+
+Using the audioplayer template tag
+==================================
+The audioplayer can be used in any template like this::
+
+    {% load audioplayer %}
+    # ...
+    {% audioplayer file=file_url %}
+    # ...
+
+First load the audioplayer template tag library, then instantiate the player
+as often as you like, using different files and/or player configurations.
+
+Here's a live example:
+
+Customizing the audioplayer
+===========================
+The audioplayer can be customized to fit your project's needs.You can set
+looping, width, height and the colors for the various player areas like
+this::
+
+    {% audioplayer file=file_url,loop=True,autostart=True,bg=0xff000 %}
+
+The following table contains the full list of supported parameters. The
+original can be found at 1pixelout_runtime_. Please be aware that the
+original values for the ``autostart`` and ``loop`` has been *pythonified*:
+Instead of using ``yes`` and ``no`` the ``audioplayer`` tag can also use
+``False`` and ``True``.
+
+.. _1pixelout_runtime: http://www.1pixelout.net/code/audio-player-wordpress-plugin/#runtime
+  
+============== ========== ===================================================
+Parameter      Default    Description
+============== ========== ===================================================
+file           -          The URL of the mp3 file
+playerUrl      see below  The URL of the player.swf file
+autostart      False      The player will automatically open and start to
+                          play the track (False|True)
+loop           False      The track will be looped indefinitely (False|True)
+bg             0xHHHHHH   Background colour option (where HHHHHH is a valid
+                          hexadecimal colour value such as FFFFFF or 009933)
+bgcolor        0xHHHHHH   Background colour
+leftbg         0xHHHHHH   Left background colour
+rightbg        0xHHHHHH   Right background colour
+rightbghover   0xHHHHHH   Right background colour (hover)
+lefticon       0xHHHHHH   Left icon colour
+righticon      0xHHHHHH   Right icon colour
+righticonhover 0xHHHHHH   Right icon colour (hover)
+text           0xHHHHHH   Text colour
+slider         0xHHHHHH   Slider colour
+loader         0xHHHHHH   Loader bar colour
+track          0xHHHHHH   Progress track colour
+border         0xHHHHHH   Progress track border colour
+width          156        The width of the player 
+height         18         The height of the player
+
+============== ========== ===================================================
+
+Serving the Flash player
+========================
+By default the audioplayer tag uses the player.swf found at 
+``{{ MEDIA_URL }}/audioplayer/player.swf``.
+
+To change that behaviour pass the URL of the player using the ``playerUrl``
+parameter like this::
+
+    {% audioplayer file=file.mp3,playerUrl=/foo/bar/player.swf,loop=True %}
+    
+
+Inserted code
+=============
+The following code is inserted by the ``audioplayer`` template tag based on the
+``audioplayer/audioplayer.html`` template (the shown code is just an example and
+varies depending on your parameters)::
+
+    <object type="application/x-shockwave-flash" data="/media/audioplayer/player.swf" width="156" height="18" class="audioplayer">
+        <param name="movie" value="/media/audioplayer/player.swf" />
+        <param name="FlashVars" value="height=18&#38;bg=0xff000&#38;slider=0xB29461&#38;track=0xFFFFFF&#38;righticon=0x666666&#38;lefticon=0x666666&#38;soundFile=%2Fmedia%2Faudio%2FSucker_Kings_-_Cab_Driver.mp3&#38;loader=0xEEFFCC&#38;rightbg=0xCCCCCC&#38;bgcolor=0xFFFFFF&#38;rightbghover=0xAAAAAA&#38;autostart=no&#38;text=0x4F4F4F&#38;leftbg=0xEFEFEF&#38;righticonhover=0x444444&#38;border=0x00FF00&#38;width=156&#38;loop=yes" />
+        <param name="quality" value="high" />
+        <param name="menu" value="false" />
+        <param name="wmode" value="transparent" />
+        <param name="bgcolor" value="#FFFFFF" />
+    </object>
+
+Replacing the default code template
+-----------------------------------
+The code shown above is read from the template ``audioplayer/audioplayer.html``.
+You can provide a custom template to adopt the code to your needs. The
+template will be passed the following context variables:
+
+player_url
+    The URL of the audioplayer.
+width
+    The width of the player.
+height
+    The height of the player.
+bgcolor
+    The background color of the player.
+flash_vars
+    The flashvars for the player.
+
+Flash vars format
+-----------------
+Internally the flash vars are encoded using the ``urlencode`` function from
+the ``urllib``. Here's an example of some flash vars after the encoding::
+    
+    height=18&bg=0xff000&slider=0xB29461&track=0xFFFFFF&righticon=0x666666
+
+Unfortunately the ampersand "&" is not allowed in XHTML documents and needs to
+be encoded. Rather to encode it using the entity representation ``&amp;`` the
+unicode representation ``&38;`` is used, so the encoded flash vars look like
+this::
+
+    height=18&#38;bg=0xff000&#38;slider=0xB29461&#38;track=0xFFFFFF&#38;righticon=0x666666
+
+Autoescape considerations
+-------------------------
+In order to play nicely with the new `autoescape feature`_ in the Django
+development version you need version ``>=0.2.2`` of the audioplayer app.
+
+Up from this version the template tag marks the inserted code as safe and
+correctly respects the current autoescape value in the template context, which
+needs to be considered when you provide a custom
+``audioplayer/audioplayer.html`` template.
+    
+.. _`autoescape feature`: http://www.djangoproject.com/documentation/templates/#automatic-html-escaping
+
+Alternatives
+============
+
+JavaScript
+----------
+Instead of integrating the audioplayer using a template tag one could also use
+some JavaScript to add the player to the page. The easiest way to achieve this
+is to use the jQuery_ and the jQuery plugin jMP3_.
+
+.. _jQuery: http://www.jquery.com
+.. _jMP3: http://www.sean-o.com/jquery/jmp3/
+
+Other Flash players
+-------------------
+Besides the nice player from 1pixelout_, there are several other Flash based
+audioplayers out on the web. Here's a list of them:
+
+* http://1bit.markwheeler.net/
+* http://www.sean-o.com/jquery/jmp3/
+* http://jeroenwijering.com/?item=Flash_Single_MP3_Player
+
+Changelog
+=========
+
+0.2.2
+-----
+- Adopted to ``autoescape`` feature in Django development version (tested with
+  ``0.97-pre-SVN-6977``).
+- The inserted code is now marked as safe using the
+  ``django.utils.safestring.mark_safe()`` method.
+- The current ``autoescape`` setting in the template context is now correctly
+  passed to the context rendering the ``audioplayer.html``.
+
+0.2.1
+-----
+- Ampersands (&) in the flashvars value are now replaced by the entity
+  #&38; in order to produce valid XHTML code.
+
+0.2
+---
+- The audioplayer is now really searched at
+  ``{{ MEDIA_URL }}/audioplayer/player.swf`` as described in the documentation
+  above.
+- The parameters ``autostart`` and ``loop`` are now pythonified as
+  described in the documentation above. Any of ``no,false,False,yes,true,True``
+  can be used.
+- The inserted ``<object>`` code is now based on the template
+  ``audioplayer/audioplayer.html``.
+ 
+0.1
+---
+Initial release.
+ 

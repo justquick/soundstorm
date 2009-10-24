@@ -1,0 +1,11 @@
+from django.conf.urls.defaults import *
+
+
+
+urlpatterns = patterns('soundstorm.song.views',
+    (r'^info/(?P<song_id>\d+)/$', 'info'),
+    #(r'^download/(?P<song_id>\d+)/$', 'download'),
+    (r'^player/(?P<song_id>\d+)/$', 'player'),
+    (r'^browse/(.*)', 'browse'),
+    (r'^$', 'list'),
+)
